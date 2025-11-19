@@ -870,7 +870,7 @@ export class HarnMasterActor extends Actor {
     }
 
     static chatListeners(html) {
-        html.on('click', '.card-buttons button', this._onChatCardAction.bind(this));
+        $(html).on('click', '.card-buttons button', this._onChatCardAction.bind(this));
     }
 
     static async _onChatCardAction(event) {
