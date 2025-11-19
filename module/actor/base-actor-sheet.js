@@ -36,9 +36,9 @@ export class HarnMasterBaseActorSheet extends ActorSheet {
         data.adata = data.actor.system;
         data.labels = this.actor.labels || {};
         data.filters = this._filters;
-        
+
         data.macroTypes = foundry.utils.deepClone(game.system.documentTypes.Macro);
-    
+
         data.dtypes = ["String", "Number", "Boolean"];
         let capacityMax = 0;
         let capacityVal = 0;
@@ -89,17 +89,15 @@ export class HarnMasterBaseActorSheet extends ActorSheet {
         // get active effects.
         data.effects = {};
         this.actor.effects.forEach(effect => {
-            effect._getSourceName().then(() => {
-                data.effects[effect.id] = {
-                    'id': effect.id,
-                    'label': effect.label,
-                    'sourceName': effect.sourceName,
-                    'duration': utility.aeDuration(effect),
-                    'source': effect,
-                    'changes': utility.aeChanges(effect)
-                }
-                data.effects[effect.id].disabled = effect.disabled;
-            });
+            data.effects[effect.id] = {
+                'id': effect.id,
+                'name': effect.name,
+                'sourceName': effect.sourceName,
+                'duration': utility.aeDuration(effect),
+                'source': effect,
+                'changes': utility.aeChanges(effect),
+                'disabled': effect.disabled
+            };
         });
 
         return data;
@@ -116,7 +114,7 @@ export class HarnMasterBaseActorSheet extends ActorSheet {
         // Get the drag source and its siblings
         const source = this.actor.items.get(itemData._id);
         const siblings = this.actor.items.filter(i => {
-            return (i.type.endsWith('gear') && 
+            return (i.type.endsWith('gear') &&
                 (i.id !== source.id));
         });
 

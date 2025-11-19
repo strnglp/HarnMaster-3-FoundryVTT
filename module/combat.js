@@ -3,15 +3,15 @@ import { HM3 } from "./config.js";
 
 /**
  * Initiates a missile attack.
- * 
+ *
  * Displays a missile attack dialog asking for attributes of the attack (aim location,
  * special modifiers, etc.) and generates a missile attack chat message that includes
  * buttons for selecting the appropriate defense.
- * 
+ *
  * No die rolling occurs as a result of this function, only the declaration of the attack.
- * 
- * @param attackToken {Token} Token representing attacker 
- * @param defendToken {Token} Token representing defender 
+ *
+ * @param attackToken {Token} Token representing attacker
+ * @param defendToken {Token} Token representing defender
  * @param weaponItem {Item} Missile weapon used by attacker
  */
 export async function missileAttack(attackToken, defendToken, missileItem) {
@@ -25,8 +25,8 @@ export async function missileAttack(attackToken, defendToken, missileItem) {
         console.error(`HM3 | missileAttack attackToken=${attackToken} is not valid.`);
         return null;
     }
-    
-    
+
+
     if (!defendToken) {
         ui.notifications.warn(`No defender token identified.`);
         return null;
@@ -140,15 +140,15 @@ export async function missileAttack(attackToken, defendToken, missileItem) {
 
 /**
  * Initiates a melee attack.
- * 
+ *
  * Displays a melee attack dialog asking for attributes of the attack (aim location,
  * special modifiers, etc.) and generates a melee attack chat message that includes
  * buttons for selecting the appropriate defense.
- * 
+ *
  * No die rolling occurs as a result of this function, only the declaration of the attack.
- * 
- * @param attackToken {Token} Token representing attacker 
- * @param defendToken {Token} Token representing defender 
+ *
+ * @param attackToken {Token} Token representing attacker
+ * @param defendToken {Token} Token representing defender
  * @param weaponItem {Item} Melee weapon used by attacker
  */
 export async function meleeAttack(attackToken, defendToken, weaponItem=null) {
@@ -161,8 +161,8 @@ export async function meleeAttack(attackToken, defendToken, weaponItem=null) {
         console.error(`HM3 | meleeAttack attackToken=${attackToken} is not valid.`);
         return null;
     }
-    
-    
+
+
     if (!defendToken) {
         ui.notifications.warn(`No defender token identified.`);
         return null;
@@ -221,7 +221,7 @@ export async function meleeAttack(attackToken, defendToken, weaponItem=null) {
     if (!weaponItem) {
         weaponItem = dialogResult.weapon;
     }
-    
+
     const effAML = dialogResult.weapon.system.attackMasteryLevel + dialogResult.addlModifier;
 
     // Prepare for Chat Message
@@ -271,14 +271,14 @@ export async function meleeAttack(attackToken, defendToken, weaponItem=null) {
 
 /**
  * Displays a dialog asking user to choose a weapon (and optionally a modifier).
- * 
+ *
  * Options:
  * name (String): name of actor to select the weapon
  * weapons (Array<Item>) a list of items (weapongear or missilegear)
  * defaultWeapon (Item) the default item choice
  * modifierType (string) A word to put between "Additional ??? Modifier"
- * 
- * @param {Object} options 
+ *
+ * @param {Object} options
  */
 async function selectWeaponDialog(options) {
     let queryWeaponDialog = "systems/hm3/templates/dialog/query-weapon-dialog.html";
@@ -293,7 +293,7 @@ async function selectWeaponDialog(options) {
         dialogOptions.modifierType = options.modifierType;
     }
     dialogOptions.prompt = options.prompt ? options.prompt : 'Please select your weapon';
-    
+
     const dlghtml = await renderTemplate(queryWeaponDialog, dialogOptions);
 
     // Request weapon name
@@ -314,7 +314,7 @@ async function selectWeaponDialog(options) {
 
 /**
  * Queries for the weapon to use, and additional weapon parameters (aim, aspect, range).
- * 
+ *
  * options should include:
  * attackerName (String): The name of the attacker
  * defenderName (String): The name of the defender
@@ -323,7 +323,7 @@ async function selectWeaponDialog(options) {
  * weapon (Item): if provided, this weapon Item will be used and no weapon query performed
  * type (string): either 'Block', 'Attack', or 'Counterstrike'
  * distance (number): the distance to the target
- * 
+ *
  * The return value will be an object with the following keys:
  *  weapon (Item):      An Item representing the weapon (weapongear or missilegear)
  *  aspect (string):    The aspect (Blunt, Edged, Piercing)
@@ -332,8 +332,8 @@ async function selectWeaponDialog(options) {
  *  range (string):     The range to target (Short, Medium, Long, Extreme)
  *  rangeExceedsExtreme (boolean): Whether the distance to target exceeds its extreme range
  *  impactMod (number): Weapon impact modifier (based on weapon aspect or range)
- * 
- * @param {Object} options 
+ *
+ * @param {Object} options
  */
 async function attackDialog(options) {
     if (options.weapons) {
@@ -463,8 +463,8 @@ async function attackDialog(options) {
 
 /**
  * Determine if the token is valid (must be either a 'creature' or 'character')
- * 
- * @param {Token} token 
+ *
+ * @param {Token} token
  */
 function isValidToken(token) {
     if (!token) {
@@ -487,8 +487,8 @@ function isValidToken(token) {
 
 /**
  * Determine default melee weapon based on maximum impact.
- * 
- * @param {Token} token 
+ *
+ * @param {Token} token
  */
 function defaultMeleeWeapon(token) {
     if (!isValidToken(token)) return {weapons: [], defaultWeapon: null};
@@ -506,7 +506,7 @@ function defaultMeleeWeapon(token) {
             }
         });
     }
-    
+
     return {
         weapons: equippedWeapons,
         defaultWeapon: defaultWeapon
@@ -516,7 +516,7 @@ function defaultMeleeWeapon(token) {
 /**
  * Resume the attack with the defender performing the "Counterstrike" defense.
  * Note that this defense is only applicable to melee attacks.
- * 
+ *
  * @param {*} atkToken Token representing the attacker
  * @param {*} defToken Token representing the defender
  * @param {*} atkWeaponName Name of the weapon the attacker is using
@@ -594,7 +594,7 @@ export async function meleeCounterstrikeResume(atkToken, defToken, atkWeaponName
     if (combatResult.outcome.atkDice) {
         atkImpactRoll = await new Roll(`${combatResult.outcome.atkDice}d6`).evaluate({async: true});
     }
-    
+
     let csImpactRoll = null;
     if (combatResult.outcome.defDice) {
         csImpactRoll = await new Roll(`${combatResult.outcome.defDice}d6`).evaluate({async: true});
@@ -629,7 +629,7 @@ export async function meleeCounterstrikeResume(atkToken, defToken, atkWeaponName
         isDefFumbleRoll: null,
         visibleAtkActorId: atkToken.actor.id,
         visibleDefActorId: defToken.actor.id
-    } 
+    }
 
     const csChatData = {
         title: `Counterstrike Result`,
@@ -718,7 +718,7 @@ export async function meleeCounterstrikeResume(atkToken, defToken, atkWeaponName
 
 /**
  * Resume the attack with the defender performing the "Dodge" defense.
- * 
+ *
  * @param {*} atkToken Token representing the attacker
  * @param {*} defToken Token representing the defender
  * @param {*} type Type of attack: "melee" or "missile"
@@ -814,7 +814,7 @@ export async function dodgeResume(atkToken, defToken, type, weaponName, effAML, 
         isDefFumbleRoll: combatResult.outcome.defFumble,
         visibleAtkActorId: atkToken.actor.id,
         visibleDefActorId: defToken.actor.id
-    } 
+    }
 
     let chatTemplate = "systems/hm3/templates/chat/attack-result-card.html";
 
@@ -846,7 +846,7 @@ export async function dodgeResume(atkToken, defToken, type, weaponName, effAML, 
 
 /**
  * Resume the attack with the defender performing the "Block" defense.
- * 
+ *
  * @param {*} atkToken Token representing the attacker
  * @param {*} defToken Token representing the defender
  * @param {*} type Type of attack: "melee" or "missile"
@@ -887,7 +887,7 @@ export async function blockResume(atkToken, defToken, type, weaponName, effAML, 
     if (type === 'missile') {
         atkWeapon = atkToken.actor.itemTypes.missilegear.find(w => w.name === weaponName);
         const highVelocityMissile = /\bbow\b|shortbow|longbow|crossbow|\bsling\b|\barrow\b|\bbolt\b|\bbullet\b/i.test(weaponName);
-    
+
         if (highVelocityMissile) {
             if (!shields.length) {
                 ui.notifications.warn(`${weaponName} is a high-velocity missile that can only be blocked with a shield, and you don't have a shield equipped. Block defense refused.`);
@@ -917,11 +917,11 @@ export async function blockResume(atkToken, defToken, type, weaponName, effAML, 
             weapons.push(w);
         }
     })
-    
+
     if (weapons.length === 0) {
         return ui.notifications.warn(`${defToken.name} has no weapons that can be used for blocking, block defense refused.`);
     }
-    
+
     let outnumberedMod = 0;
     if (defToken.actor?.system?.eph?.outnumbered > 1) {
         outnumberedMod = Math.floor(defToken.actor.system.eph.outnumbered - 1) * -10;
@@ -1049,7 +1049,7 @@ export async function blockResume(atkToken, defToken, type, weaponName, effAML, 
         isDefFumbleRoll: combatResult.outcome.defFumble,
         visibleAtkActorId: atkToken.actor.id,
         visibleDefActorId: defToken.actor.id
-    } 
+    }
 
     let chatTemplate = "systems/hm3/templates/chat/attack-result-card.html";
 
@@ -1167,7 +1167,7 @@ export async function checkWeaponBreak(atkWeapon, defWeapon) {
 
 /**
  * Resume the attack with the defender performing the "Ignore" defense.
- * 
+ *
  * @param {*} atkToken Token representing the attacker
  * @param {*} defToken Token representing the defender
  * @param {*} type Type of attack: "melee" or "missile"
@@ -1245,7 +1245,7 @@ export async function ignoreResume(atkToken, defToken, type, weaponName, effAML,
         isDefFumbleRoll: combatResult.outcome.defFumble,
         visibleAtkActorId: atkToken.actor.id,
         visibleDefActorId: defToken.actor.id
-    } 
+    }
 
     let chatTemplate = "systems/hm3/templates/chat/attack-result-card.html";
 
@@ -1274,7 +1274,7 @@ export async function ignoreResume(atkToken, defToken, type, weaponName, effAML,
 
 /**
  * Display the results of meele combat.
- * 
+ *
  * @param {String} atkResult The result from the attack, comprised of "cs", "cf", "ms", or "mf"
  * @param {String} defResult The result from the defense, comprised of "cs", "cf", "ms", or "mf"
  * @param {String} defense The type of defense: "ignore", "block", "counterstrike", or "dodge"
@@ -1297,7 +1297,7 @@ export function meleeCombatResult(atkResult, defResult, defense, atkAddlImpact=0
     if (!outcome) return null;
 
     const result = { outcome: outcome, desc: 'Attack misses.', csDesc: 'Counterstrike misses.'};
-    
+
     if (defense !== 'counterstrike') {
         if (outcome.atkDice) {
             result.desc = `Attacker strikes for ${diceFormula(outcome.atkDice, atkAddlImpact)} impact.`;
@@ -1348,7 +1348,7 @@ export function meleeCombatResult(atkResult, defResult, defense, atkAddlImpact=0
 
 /**
  * Calculate and display the results of the missile combat.
- * 
+ *
  * @param {String} atkResult The result from the attack, comprised of "cs", "cf", "ms", or "mf"
  * @param {String} defResult The result from the defense, comprised of "cs", "cf", "ms", or "mf"
  * @param {String} defense The type of defense: "ignore", "block", "counterstrike", or "dodge"
@@ -1370,7 +1370,7 @@ export function missileCombatResult(atkResult, defResult, defense, atkAddlImpact
     if (!outcome) return null;
 
     const result = { outcome: outcome, desc: 'No result' };
-    
+
     if (outcome.atkDice && !outcome.defDice) {
         result.desc = `Missile strikes for ${diceFormula(outcome.atkDice, atkAddlImpact)} impact.`;
     } else if (outcome.wild) {
@@ -1386,8 +1386,8 @@ export function missileCombatResult(atkResult, defResult, defense, atkAddlImpact
 
 /**
  * Return the dice formula meeting the specified parameters
- * 
- * @param {*} numDice  Number of 6-sided dice to include in the formula 
+ *
+ * @param {*} numDice  Number of 6-sided dice to include in the formula
  * @param {*} addlImpact Any additional impact to include in the formula
  */
 function diceFormula (numDice, addlImpact) {
@@ -1405,7 +1405,7 @@ function diceFormula (numDice, addlImpact) {
  * Returns a structure specifying the default aspect for a weapon, as well as the
  * impact values for all other aspects.  The default aspect is always the aspect
  * with the greatest impact.
- * 
+ *
  * @param {*} weapon Name of weapon
  * @param {*} items List of items containing 'weapongear' items.
  */
@@ -1434,7 +1434,7 @@ function calcWeaponAspect(weapon) {
             result.defaultAspect = "Edged";
         } else if (maxImpact === data.blunt) {
             result.defaultAspect = "Blunt";
-        }    
+        }
     }
 
     return result;
@@ -1442,7 +1442,7 @@ function calcWeaponAspect(weapon) {
 
 /**
  * Finds an Item by name or UUID. If name is provided, searches within the specified actor.
- * 
+ *
  * @param {*} itemName Either an Item or a string formatted as a UUID
  * @param {*} type The type of Item (e.g., "missilegear")
  * @param {*} actor The actor containing the items to search
@@ -1454,13 +1454,13 @@ export async function getItem(itemName, type, actor) {
     }
 
     let item = await fromUuid(itemName);
-    
+
     if (!item) {
         if (!actor || typeof actor !== 'object') {
             ui.notifications.warn('No actor was selected. You must select an actor.');
             return null;
         }
-    
+
         const lcItemName = itemName.toLowerCase();
         const items = actor ? actor.items.filter(i => i.type === type && i.name.toLowerCase() === lcItemName) : [];
         if (items.length > 1) {
@@ -1482,8 +1482,8 @@ export async function getItem(itemName, type, actor) {
 
 /**
  * Calculates the distance from sourceToken to targetToken in "scene" units (e.g., feet).
- * 
- * @param {Token} sourceToken 
+ *
+ * @param {Token} sourceToken
  * @param {Token} targetToken
  * @param {Boolean} gridUnits If true, return in grid units, not "scene" units
  */
@@ -1512,7 +1512,7 @@ export function rangeToTarget(sourceToken, targetToken, gridUnits=false) {
  * Optionally hide the display of chat card action buttons which cannot be performed by the user
  */
 export const displayChatActionButtons = function(message, html, data) {
-    const chatCard = html.find(".hm3.chat-card");
+    const chatCard = $(html).find(".hm3.chat-card");
     if ( chatCard.length > 0 ) {
         // If the user is the GM, proceed
         if (game.user.isGM) return;
@@ -1527,4 +1527,3 @@ export const displayChatActionButtons = function(message, html, data) {
         });
     }
 };
-  

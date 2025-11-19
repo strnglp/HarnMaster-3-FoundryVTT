@@ -22,7 +22,7 @@ export async function onManageActiveEffect(event, owner) {
                 dialogData.combatTurn = game.combat.turn;
             }
             const html = await renderTemplate(dlgTemplate, dialogData);
-    
+
             // Create the dialog window
             return Dialog.prompt({
                 title: "Select Start Time",
@@ -35,8 +35,8 @@ export async function onManageActiveEffect(event, owner) {
                     const startType = formdata.startType;
 
                     const aeData = {
-                        label: "New Effect",
-                        icon: "icons/svg/aura.svg",
+                        name: "New Effect",
+                        img: "icons/svg/aura.svg",
                         origin: owner.uuid
                     };
                     if (startType === 'nowGameTime') {
@@ -100,8 +100,8 @@ export async function checkExpiredActiveEffects() {
 /**
  * Checks all of the active effects for a single actor and disables
  * them if their duration has expired.
- * 
- * @param {Actor} actor 
+ *
+ * @param {Actor} actor
  */
 async function disableExpiredAE(actor) {
     for (let effect of actor.effects.values()) {

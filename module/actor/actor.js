@@ -23,7 +23,7 @@ export class HarnMasterActor extends Actor {
         while ( takenNames.has(name) ) name = `${baseName} (${++index})`;
         return name;
     }
-  
+
     static async createDialog(data = {}, {parent=null, pack=null, types, ...options} = {}) {
         if ( this.hasTypeData && types ) {
             if ( types.length === 0 ) throw new Error("The array of sub-types to restrict to must not be empty");
@@ -33,7 +33,7 @@ export class HarnMasterActor extends Actor {
                 }
             }
         }
-    
+
         // Collect data
         const documentTypes = this.TYPES.filter(t => (t !== CONST.BASE_DOCUMENT_TYPE)
             && (types?.includes(t) !== false));
@@ -167,10 +167,10 @@ export class HarnMasterActor extends Actor {
         itemAry.sort((a,b) => itemNames.indexOf(a.name) - itemNames.indexOf(b.name));
         items.push(...itemAry);
     }
-        
+
     /**
      * Create an armorlocation ItemData element
-     * 
+     *
      * @param {*} locName Location Name
      * @param {*} templateName Location Template Name
      * @returns an armorlocation ItemData
@@ -184,7 +184,7 @@ export class HarnMasterActor extends Actor {
     /**
      * Add armorlocation items to the items array for all of the locations for
      * a humanoid
-     * 
+     *
      * @param {*} items Array of ItemData elements
      */
     static _createDefaultHumanoidLocations(items) {
@@ -222,7 +222,7 @@ export class HarnMasterActor extends Actor {
      * information from the Actor._source.items array.  So, at this point we may safely
      * use Actor._source.items, so long as we remember that that data is going to be going
      * through a prepareData() stage next.
-     * 
+     *
      * @override */
     prepareBaseData() {
         super.prepareBaseData();
@@ -345,13 +345,13 @@ export class HarnMasterActor extends Actor {
         Hooks.call("hm3.onActorPrepareBaseData", this);
     }
 
-    /** 
+    /**
      * Perform data preparation after Items preparation and Active Effects have
      * been applied.
-     * 
+     *
      * Note that all Active Effects have already been applied by this point, so
      * nothing in this method will be affected further by Active Effects.
-     * 
+     *
      * @override */
     prepareDerivedData() {
         super.prepareDerivedData();
@@ -984,10 +984,10 @@ export class HarnMasterActor extends Actor {
     /**
      * This method implements Item-based effects.  It applies three types of AE:
      *   Skill EML - Modifies the EML of a specific Skill (or Psionic talent)
-     * 
+     *
      * Note that unlike normal Active Effects, these effects apply to the Itens data model,
      * not the Actor's data model.
-     * 
+     *
      * The "value" field should look like "<item name>:<magnitude>"
      */
      _applySkillActiveEffects() {
@@ -1034,10 +1034,10 @@ export class HarnMasterActor extends Actor {
      * This method implements Item-based weapon effects.  It applies two types of AE:
      *   Weapon Attack ML - Modifies the AML of a single weapon
      *   Weapon Defense ML - Modifies the DML of a single weapon
-     * 
+     *
      * Note that unlike normal Active Effects, these effects apply to the Items data model,
      * not the Actor's data model.
-     * 
+     *
      * The "value" field should look like "<item name>:<magnitude>"
      */
      _applyWeaponActiveEffects() {
@@ -1051,14 +1051,14 @@ export class HarnMasterActor extends Actor {
                     if (isNaN(magnitude)) return false;
                     const skillName = val[0];
                     for (let item in this.items.values()) {
-                        if ((item.name === skillName) && 
+                        if ((item.name === skillName) &&
                         (item.type === 'weapongear' || item.type === 'missilegear')) return true;
                     }
                 }
-                
+
                 return false;
             });
-                
+
             const dmlChanges = e.changes.filter(chg => {
                 if (chg.key === 'system.eph.itemDMLMod') {
                     const val = utility.parseAEValue(chg.value);
@@ -1067,11 +1067,11 @@ export class HarnMasterActor extends Actor {
                     if (isNaN(magnitude)) return false;
                     const skillName = val[0];
                     for (let item in this.items.values()) {
-                        if ((item.name === skillName) && 
+                        if ((item.name === skillName) &&
                         item.type === 'weapongear') return true;
                     }
                 }
-                
+
                 return false;
             });
 
@@ -1124,10 +1124,10 @@ export class HarnMasterActor extends Actor {
     /**
      * This method searches through all the active effects on this actor and applies
      * only that active effect whose key matches the specified 'property' value.
-     * 
+     *
      * The purpose is to allow an active effect to be applied after normal active effect
      * processing is complete.
-     * 
+     *
      * @param {String} property The Actor data model property to apply
      */
     applySpecificActiveEffect(property) {
@@ -1161,8 +1161,8 @@ export class HarnMasterActor extends Actor {
      * This method applys a blanket skill AE modifier to all skills of a particular type.
      * For instance, if the skill is a communication skill, then it will apply the
      * data.eph.commSkillsMod modifier to the effectiveMasteryLevel for that skill.
-     * 
-     * @param {Item} skill The item representing the skill to apply the active effect to. 
+     *
+     * @param {Item} skill The item representing the skill to apply the active effect to.
      */
     applySkillTypeActiveEffect(skill) {
         const skillData = skill.system;
@@ -1222,9 +1222,9 @@ export class HarnMasterActor extends Actor {
 
     /**
      * Run a custom macro assigned to this item.
-     * 
+     *
      * Returns an object with the following fields:
-     * 
+     *
      * type: type of roll (ability-d6, ability-d100, shock, stumble, fumble, dodge, healing)
      * title: Chat label for Roll,
      * origTarget: Unmodified target value,
@@ -1303,16 +1303,15 @@ export class HarnMasterActor extends Actor {
         const data = actor.system;
         data.universalPenalty = data.eph.totalInjuryLevels + data.eph.fatigue;
     }
-    
+
     static calcPhysicalPenalty(actor) {
         const data = actor.system;
         data.physicalPenalty = data.universalPenalty + data.encumbrance;
     }
-    
+
     static calcShockIndex(actor) {
         const data = actor.system;
-        data.shockIndex.value = 
+        data.shockIndex.value =
             HarnMasterActor.normProb(data.endurance, data.universalPenalty * 3.5, data.universalPenalty);
-    }    
+    }
 }
-

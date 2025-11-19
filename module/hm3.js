@@ -72,7 +72,7 @@ Hooks.once('init', async function () {
         miscgear: "Misc. Gear",
         injury: "Injury",
         armorlocation: "Armor Location",
-        trait: "Trait"    
+        trait: "Trait"
     };
     CONFIG.Combat.documentClass = HarnMasterCombat;
     CONFIG.TinyMCE.style_formats[0].items.push({
@@ -210,7 +210,7 @@ Hooks.on('renderSceneConfig', (app, html, data) => {
     const scene = app.object;
     if (app.renderTOTMScene) return;
     app.renderTOTMScene = true;
-    
+
     let isTotm = scene.getFlag('hm3', 'isTotm');
     if (typeof isTotm === 'undefined') {
         if (!scene.compendium) {
