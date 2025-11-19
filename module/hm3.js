@@ -145,12 +145,11 @@ Hooks.once('init', async function () {
 
 });
 
-Hooks.on("renderChatMessage", (app, html, data) => {
+Hooks.on("renderChatMessageHTML", (app, html, data) => {
     // Display action buttons
     combat.displayChatActionButtons(app, html, data);
+    HarnMasterActor.chatListeners(html);
 });
-Hooks.on('renderChatLog', (app, html, data) => HarnMasterActor.chatListeners(html));
-Hooks.on('renderChatPopout', (app, html, data) => HarnMasterActor.chatListeners(html));
 
 /**
  * Active Effects need to expire at certain times, so keep track of that here
