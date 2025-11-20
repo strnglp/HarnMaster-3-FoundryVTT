@@ -5,7 +5,7 @@
 
     {{#if notes}}
     <div class="card-note">
-        <span>{{notes}}</span>
+        <span>{{{notes}}}</span>
     </div>
     {{/if}}
 
@@ -61,5 +61,12 @@
         </footer>
         {{/if}}
     {{/if}}
-    </footer>
+
+    {{#if buttons}}
+    <div class="card-buttons">
+        {{#each buttons}}
+        <button data-action="{{this.action}}" data-visible-actor-id="{{this.actorId}}" {{#if this.tokenId}}data-token-id="{{this.tokenId}}"{{/if}}>{{this.label}}</button>
+        {{/each}}
+    </div>
+    {{/if}}
 </div>

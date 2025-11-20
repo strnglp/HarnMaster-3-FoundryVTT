@@ -976,6 +976,10 @@ export class HarnMasterActor extends Actor {
             case 'fumble':
                 macros.fumbleRoll(false, actor);
                 break;
+
+            case 'morale-effect':
+                macros.moraleEffectRoll(actor);
+                break;
         }
 
         button.disabled = false;

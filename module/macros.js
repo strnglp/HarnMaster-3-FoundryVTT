@@ -739,7 +739,7 @@ export async function dodgeRoll(noDialog = false, myActor = null) {
     } else {
         stdRollData.actor = actorInfo.actor.id;
     }
-    
+
     const hooksOk = Hooks.call("hm3.preDodgeRoll", stdRollData, actorInfo.actor);
     if (hooksOk) {
         const result = await DiceHM3.d100StdRoll(stdRollData);
@@ -749,6 +749,123 @@ export async function dodgeRoll(noDialog = false, myActor = null) {
         return result;
     }
     return null;
+}
+
+export async function initiativeRoll(noDialog = false, myActor = null) {
+    const actorInfo = getActor({actor: myActor, item: null, speaker: ChatMessage.getSpeaker()});
+    if (!actorInfo) {
+        ui.notifications.warn(`No actor for this action could be determined.`);
+        return null;
+    }
+
+    const actorId = actorInfo.actor.id;
+    const tokenId = actorInfo.actor.isToken ? actorInfo.actor.token.id : null;
+
+    const stdRollData = {
+        type: 'initiative',
+        label: `Initiative Roll`,
+        target: actorInfo.actor.system.initiative,
+        notesData: {},
+        speaker: actorInfo.speaker,
+        fastforward: noDialog,
+        notes: '',
+        resultNotes: {
+            cs: '<b>CS:</b> Character selects and executes any Action Option, with a +10 bonus to EML. If the character\'s current morale state is non-normal, it returns to normal.',
+            ms: '<b>MS:</b> Character selects and executes an Action Option normally.',
+            mf: '<b>MF:</b> Character is Cautious for this turn only (pass).',
+            cf: '<b>CF:</b> Character panics or freezes. This is a breakdown of morale and/or discipline.'
+        },
+        resultButtons: {
+            cf: [{
+                action: 'morale-effect',
+                label: 'Roll Effect',
+                actorId: actorId,
+                tokenId: tokenId
+            }]
+        }
+    };
+    if (actorInfo.actor.isToken) {
+        stdRollData.token = actorInfo.actor.token.id;
+    } else {
+        stdRollData.actor = actorInfo.actor.id;
+    }
+
+    const hooksOk = Hooks.call("hm3.preInitiativeRoll", stdRollData, actorInfo.actor);
+    if (hooksOk) {
+        const result = await DiceHM3.d100StdRoll(stdRollData);
+        if (result) {
+            callOnHooks("hm3.onInitiativeRoll", actorInfo.actor, result, stdRollData);
+        }
+        return result;
+    }
+    return null;
+}
+
+export async function moraleEffectRoll(myActor = null) {
+    const actorInfo = getActor({actor: myActor, item: null, speaker: ChatMessage.getSpeaker()});
+    if (!actorInfo) {
+        ui.notifications.warn(`No actor for this action could be determined.`);
+        return null;
+    }
+
+    // Roll 1d100
+    const roll = await new Roll('1d100').evaluate({async: true});
+    const rollValue = roll.total;
+
+    // Determine morale state based on roll
+    let moraleState = '';
+    let moraleDesc = '';
+
+    if (rollValue <= 25) {
+        moraleState = 'Berserk';
+        moraleDesc = '<b>Berserk:</b> This is a special state of battle frenzy. Any character who enters this mode must take the most aggressive action available for Attack or Defense, adding 20 to EML to Attack or Counterstrike. Further Initiative rolls are ignored until the battle ends.';
+    } else if (rollValue <= 50) {
+        moraleState = 'Desperate';
+        moraleDesc = '<b>Desperate:</b> Character tries to conclude the battle, one way or the other, as soon as possible. Until the situation changes and a new Initiative Test is passed, the character selects the most aggressive option available.';
+    } else if (rollValue <= 75) {
+        moraleState = 'Broken';
+        moraleDesc = '<b>Broken:</b> The character is unable to fight in any useful way. The only available options are flight or surrender. Flight is normally preferable; surrender is a last resort. If neither is feasible, the character makes a Rest or Pass action option, but can defend if attacked except that Counterstrike is prohibited.';
+    } else {
+        moraleState = 'Cautious';
+        moraleDesc = '<b>Cautious:</b> A cautious character will not Engage, must choose Pass if engaged, and cannot select the Counterstrike defense.';
+    }
+
+    // Create chat message
+    const actorName = actorInfo.actor.isToken ? actorInfo.actor.token.name : actorInfo.actor.name;
+    const content = `
+        <div class="hm3 chat-card item-card">
+            <header class="card-header flexrow">
+                <h3 class="title">${actorName} Morale Effect</h3>
+            </header>
+            <div class="card-content">
+                <span class="label">Roll:</span>
+                <span class="value">${rollValue}</span>
+            </div>
+            <div class="card-content">
+                <span class="label">Result:</span>
+                <span class="value"><b>${moraleState}</b></span>
+            </div>
+            <div class="card-note">
+                <span>${moraleDesc}</span>
+            </div>
+        </div>
+    `;
+
+    const messageData = {
+        user: game.user.id,
+        speaker: actorInfo.speaker,
+        content: content.trim(),
+        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+        sound: CONFIG.sounds.dice,
+        roll: roll
+    };
+
+    await ChatMessage.create(messageData);
+
+    return {
+        roll: rollValue,
+        moraleState: moraleState
+    };
 }
 
 export async function shockRoll(noDialog = false, myActor = null) {

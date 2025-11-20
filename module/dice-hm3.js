@@ -62,7 +62,38 @@ export class DiceHM3 {
             isMF: !roll.isSuccess && !roll.isCritical,
             isCF: !roll.isSuccess && roll.isCritical
         });
-        const renderedNotes = rollData.notes ? utility.stringReplacer(rollData.notes, notesData) : "";
+        let renderedNotes = rollData.notes ? utility.stringReplacer(rollData.notes, notesData) : "";
+
+        // Support for result-specific notes
+        if (rollData.resultNotes) {
+            let resultNote = '';
+            if (roll.isSuccess && roll.isCritical && rollData.resultNotes.cs) {
+                resultNote = rollData.resultNotes.cs;
+            } else if (roll.isSuccess && !roll.isCritical && rollData.resultNotes.ms) {
+                resultNote = rollData.resultNotes.ms;
+            } else if (!roll.isSuccess && !roll.isCritical && rollData.resultNotes.mf) {
+                resultNote = rollData.resultNotes.mf;
+            } else if (!roll.isSuccess && roll.isCritical && rollData.resultNotes.cf) {
+                resultNote = rollData.resultNotes.cf;
+            }
+            if (resultNote) {
+                renderedNotes = renderedNotes ? renderedNotes + '<br>' + resultNote : resultNote;
+            }
+        }
+
+        // Support for result-specific buttons
+        let buttons = null;
+        if (rollData.resultButtons) {
+            if (roll.isSuccess && roll.isCritical && rollData.resultButtons.cs) {
+                buttons = rollData.resultButtons.cs;
+            } else if (roll.isSuccess && !roll.isCritical && rollData.resultButtons.ms) {
+                buttons = rollData.resultButtons.ms;
+            } else if (!roll.isSuccess && !roll.isCritical && rollData.resultButtons.mf) {
+                buttons = rollData.resultButtons.mf;
+            } else if (!roll.isSuccess && roll.isCritical && rollData.resultButtons.cf) {
+                buttons = rollData.resultButtons.cf;
+            }
+        }
 
         const chatTemplateData = {
             type: roll.type,
@@ -78,6 +109,7 @@ export class DiceHM3 {
             showResult: false,
             description: roll.description,
             notes: renderedNotes,
+            buttons: buttons,
             roll: roll
         };
 

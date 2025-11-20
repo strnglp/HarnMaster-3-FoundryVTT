@@ -585,6 +585,9 @@ export class HarnMasterBaseActorSheet extends ActorSheet {
         // Dodge Roll
         html.find('.dodge-roll').click(ev => macros.dodgeRoll(ev.shiftKey || ev.altKey || ev.ctrlKey, this.actor));
 
+        // Initiative Roll
+        html.find('.initiative-roll').click(ev => macros.initiativeRoll(ev.shiftKey || ev.altKey || ev.ctrlKey, this.actor));
+
         // Shock Roll
         html.find('.shock-roll').click(ev => macros.shockRoll(ev.shiftKey || ev.altKey || ev.ctrlKey, this.actor));
 
