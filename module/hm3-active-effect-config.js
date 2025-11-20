@@ -1,26 +1,19 @@
 import { HM3 } from './config.js';
 
-/**
- * A form designed for creating and editing an Active Effect on an Actor or Item.
- * @implements {FormApplication}
- *
- * @param {ActiveEffect} object     The target active effect being configured
- * @param {object} [options]        Additional options which modify this application instance
- */
-export class HM3ActiveEffectConfig extends ActiveEffectConfig {
+export class HM3ActiveEffectConfig extends foundry.applications.sheets.ActiveEffectConfig {
 
     /** @override */
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
+    static PARTS = {
+        ...super.PARTS,
+        changes: {
             template: "systems/hm3/templates/effect/active-effect-config.html",
-        });
-    }
-
-    /* ----------------------------------------- */
+            scrollable: ["ol[data-changes]"]
+        }
+    };
 
     /** @override */
-    async getData(options={}) {
-        const context = await super.getData(options);
+    async _prepareContext(options) {
+        const context = await super._prepareContext(options);
         context.keyChoices = HM3.activeEffectKey;
         return context;
     }

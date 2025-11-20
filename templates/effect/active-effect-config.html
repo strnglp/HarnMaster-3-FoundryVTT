@@ -1,137 +1,35 @@
-<form autocomplete="off">
-
-    <!-- Effect Header -->
-    <header class="sheet-header">
-        <img class="effect-icon" src="{{ data.icon }}" data-edit="icon">
-        <h1 class="effect-title">
-            <input name="name" type="text" value="{{data.name}}" placeholder="{{ localize 'Name' }}"/>
-        </h1>
+<section class="tab changes{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <header>
+        <div class="key">{{localize "EFFECT.ChangeKey"}}</div>
+        <div class="mode">{{localize "EFFECT.ChangeMode"}}</div>
+        <div class="value">{{localize "EFFECT.ChangeValue"}}</div>
+        <div class="priority">{{localize "EFFECT.ChangePriority"}}</div>
+        <div class="controls">
+            <button type="button" class="inline-control icon fa-regular fa-square-plus" data-action="addChange"></button>
+        </div>
     </header>
-
-    <!-- Effect Configuration Tabs -->
-    <nav class="sheet-tabs tabs" aria-role="{{localize 'SHEETS.FormNavLabel'}}">
-        <a class="item" data-tab="details"><i class="fas fa-book"></i> {{localize "EFFECT.TabDetails"}}</a>
-        <a class="item" data-tab="duration"><i class="fas fa-clock"></i> {{localize "EFFECT.TabDuration"}}</a>
-        <a class="item" data-tab="effects"><i class="fas fa-cogs"></i> {{localize "EFFECT.TabEffects"}}</a>
-    </nav>
-
-    <!-- Details Tab -->
-    <section class="tab" data-tab="details">
-        <div class="form-group">
-            <label>{{ localize "EFFECT.IconTint" }}</label>
-            <div class="form-fields">
-                {{colorPicker name="tint" value=data.tint}}
+    <ol class="scrollable" data-changes>
+        {{#each source.changes as |change i|}}
+        {{#with ../fields.changes.element.fields as |changeFields|}}
+        <li data-index="{{i}}">
+            <div class="key">
+                {{formInput changeFields.key name=(concat "changes." i ".key") value=change.key choices=@root.keyChoices}}
             </div>
-        </div>
-
-        <div class="form-group stacked">
-            <label>{{ localize "EFFECT.Description" }}</label>
-            {{editor descriptionHTML target="description" button=false editable=editable engine="prosemirror" collaborate=false}}
-        </div>
-
-        <div class="form-group">
-            <label>{{ localize "EFFECT.Disabled" }}</label>
-            <input type="checkbox" name="disabled" {{ checked data.disabled }}/>
-        </div>
-
-        {{#if isActorEffect}}
-        <div class="form-group">
-            <label>{{ localize "EFFECT.Origin" }}</label>
-            <div class="form-fields">
-                <input type="text" name="origin" value="{{ data.origin }}" disabled/>
+            <div class="mode">
+                {{formInput changeFields.mode name=(concat "changes." i ".mode") value=change.mode choices=@root.modes}}
             </div>
-        </div>
-        {{/if}}
-
-        {{#if isItemEffect}}
-        <div class="form-group">
-            <label>{{ labels.transfer.name }}</label>
-            <div class="form-fields">
-                <input type="checkbox" name="transfer" {{checked data.transfer}}/>
+            <div class="value">
+                {{formInput changeFields.value name=(concat "changes." i ".value") value=change.value}}
             </div>
-            <p class="hint">{{ labels.transfer.hint }}</p>
-        </div>
-        {{/if}}
-    </section>
-
-    <!-- Duration Tab -->
-    <section class="tab" data-tab="duration">
-        <div class="form-group">
-            <label>{{ localize "EFFECT.DurationSecs" }}</label>
-            <div class="form-fields">
-                <input type="number" name="duration.seconds" value="{{ data.duration.seconds }}"/>
+            <div class="priority">
+                {{formInput changeFields.priority name=(concat "changes." i ".priority") value=change.priority
+                    placeholder=(lookup ../../priorities change.mode)}}
             </div>
-        </div>
-        <div class="form-group">
-            <label>{{ localize "EFFECT.StartTime" }}</label>
-            <div class="form-fields">
-                <input type="number" name="duration.startTime" value="{{ data.duration.startTime }}"/>
+            <div class="controls">
+              <button type="button" class="inline-control icon fa-solid fa-trash" data-action="deleteChange"></button>
             </div>
-        </div>
-        <hr/>
-        <div class="form-group">
-            <label>{{ localize "EFFECT.DurationTurns" }}</label>
-            <div class="form-fields">
-                <label>{{ localize "COMBAT.Rounds" }}</label>
-                <input type="number" name="duration.rounds" value="{{ data.duration.rounds }}"/>
-                <label>{{ localize "COMBAT.Turns" }}</label>
-                <input type="number" name="duration.turns" value="{{ data.duration.turns }}"/>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>{{ localize "EFFECT.Combat" }}</label>
-            <div class="form-fields">
-                <input type="text" name="duration.combat" value="{{ data.duration.combat }}" disabled/>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>{{ localize "EFFECT.StartTurns" }}</label>
-            <div class="form-fields">
-                <label>{{ localize "COMBAT.Round" }}</label>
-                <input type="number" name="duration.startRound" value="{{ data.duration.startRound }}"/>
-                <label>{{ localize "COMBAT.Turn" }}</label>
-                <input type="number" name="duration.startTurn" value="{{ data.duration.startTurn }}"/>
-            </div>
-        </div>
-    </section>
-
-    <!-- Effects Tab -->
-    <section class="tab" data-tab="effects">
-        <header class="effect-change effects-header flexrow">
-            <div class="key">{{ localize "EFFECT.ChangeKey" }}</div>
-            <div class="mode">{{ localize "EFFECT.ChangeMode" }}</div>
-            <div class="value">{{ localize "EFFECT.ChangeValue" }}</div>
-            <div class="effect-controls">
-                <a class="effect-control" data-action="add"><i class="far fa-plus-square"></i></a>
-            </div>
-        </header>
-        <ol class="changes-list">
-            {{#each data.changes as |change i|}}
-            <li class="effect-change flexrow" data-index="{{i}}">
-                <div class="key">
-                    <select name="changes.{{i}}.key" data-dtype="String">
-                        {{log ..}}
-                        {{selectOptions ../keyChoices selected=change.key}}
-                    </select>
-                </div>
-                <div class="mode">
-                    <select name="changes.{{i}}.mode" data-dtype="Number">
-                        {{selectOptions ../modes selected=change.mode}}
-                    </select>
-                </div>
-                <div class="value">
-                    <input type="text" name="changes.{{i}}.value" value="{{change.value}}"/>
-                </div>
-                <div class="effect-controls">
-                    <a class="effect-control" data-action="delete"><i class="fas fa-trash"></i></a>
-                </div>
-            </li>
-            {{/each}}
-        </ol>
-    </section>
-
-    <footer class="sheet-footer">
-        <button type="submit"><i class="fas fa-save"></i> {{localize submitText}}</button>
-    </footer>
-</form>
+        </li>
+        {{/with}}
+        {{/each}}
+    </ol>
+</section>

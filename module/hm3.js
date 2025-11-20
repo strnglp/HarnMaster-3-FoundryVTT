@@ -48,7 +48,7 @@ Hooks.once('init', async function () {
     registerSystemSettings();
 
     // Define custom ActiveEffect class
-    //CONFIG.ActiveEffect.sheetClass = HM3ActiveEffectConfig;
+    CONFIG.ActiveEffect.sheetClass = HM3ActiveEffectConfig;
 
     // Define custom Document classes
     CONFIG.Actor.documentClass = HarnMasterActor;
@@ -100,7 +100,7 @@ Hooks.once('init', async function () {
         label: "Default HarnMaster Container Sheet"
     });
 
-    DocumentSheetConfig.unregisterSheet(ActiveEffect, "core", ActiveEffectConfig);
+    DocumentSheetConfig.unregisterSheet(ActiveEffect, "core", foundry.applications.sheets.ActiveEffectConfig);
     DocumentSheetConfig.registerSheet(ActiveEffect, "hm3", HM3ActiveEffectConfig, {
         makeDefault: true,
         label: "Default HarnMaster Active Effect Sheet"
