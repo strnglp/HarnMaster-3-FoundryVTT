@@ -111,6 +111,7 @@ export async function missileAttack(attackToken, defendToken, missileItem) {
         origAML: missileItem.system.attackMasteryLevel,
         effAML: effAML,
         impactMod: dialogResult.impactMod,
+        aimPenalty: dialogResult.aim !== 'Mid',
         hasDodge: true,
         hasBlock: true,
         hasCounterstrike: false,
@@ -242,6 +243,7 @@ export async function meleeAttack(attackToken, defendToken, weaponItem=null) {
         origAML: weaponItem.system.attackMasteryLevel,
         effAML: effAML,
         impactMod: dialogResult.impactMod,
+        aimPenalty: dialogResult.aim !== 'Mid',
         hasDodge: true,
         hasBlock: true,
         hasCounterstrike: true,
@@ -424,13 +426,12 @@ async function attackDialog(options) {
             const form = html[0].querySelector("form");
             const formRange = form.range ? form.range.value : null;
 
-            const addlModifier = (form.addlModifier ? parseInt(form.addlModifier.value) : 0) +
-                (form.aim?.value !== 'Mid' ? -10 : 0);
+            const addlModifier = form.addlModifier ? parseInt(form.addlModifier.value) : 0;
             const result = {
                 weapon: options.weapon,
                 aspect: form.weaponAspect ? form.weaponAspect.value : null,
                 aim: form.aim ? form.aim.value : null,
-                addlModifier: form.addlModifier ? parseInt(form.addlModifier.value) : 0,
+                addlModifier: addlModifier,
                 range: formRange,
                 rangeExceedsExtreme: dialogOptions.rangeExceedsExtreme,
                 impactMod: 0
@@ -553,23 +554,31 @@ export async function meleeCounterstrikeResume(atkToken, defToken, atkWeaponName
     const csDialogResult = await attackDialog(options);
     if (!csDialogResult) return null;
 
+    // Apply -10 aim penalty for High/Low aim when defender actively defends
+    const aimPenalty = (atkAim !== 'Mid') ? -10 : 0;
+    const adjustedAML = Number(atkEffAML) + aimPenalty;
+
     // Roll Attacker's Attack
     const atkRoll = await DiceHM3.rollTest({
         data: {},
         diceSides: 100,
         diceNum: 1,
         modifier: 0,
-        target: atkEffAML
+        target: adjustedAML
     });
 
     const csEffEML = csDialogResult.weapon.system.attackMasteryLevel;
+
+    // Apply -10 aim penalty for High/Low aim on counterstrike (always implicitly defended)
+    const csAimPenalty = (csDialogResult.aim !== 'Mid') ? -10 : 0;
+    const csAdjustedModifier = csDialogResult.addlModifier + csAimPenalty;
 
     // Roll Counterstrike Attack
     const csRoll = await DiceHM3.rollTest({
         data: {},
         diceSides: 100,
         diceNum: 1,
-        modifier: csDialogResult.addlModifier,
+        modifier: csAdjustedModifier,
         target: csEffEML
     });
 
@@ -609,7 +618,7 @@ export async function meleeCounterstrikeResume(atkToken, defToken, atkWeaponName
         attackWeapon: atkWeaponName,
         mlType: 'AML',
         defense: 'Counterstrike',
-        effAML: atkEffAML,
+        effAML: adjustedAML,
         effDML: 0,
         attackRoll: atkRoll.rollObj.total,
         atkRollResult: atkRoll.description,
@@ -640,11 +649,11 @@ export async function meleeCounterstrikeResume(atkToken, defToken, atkWeaponName
         outnumbered: defToken.actor?.system?.eph?.outnumbered > 1 ? defToken.actor.system.eph.outnumbered : 0,
         attackWeapon: csDialogResult.weapon.name,
         mlType: 'AML',
-        addlModifierAbs: Math.abs(csDialogResult.addlModifier),
-        addlModifierSign: csDialogResult.addlModifier < 0?'-':'+',
+        addlModifierAbs: Math.abs(csAdjustedModifier),
+        addlModifierSign: csAdjustedModifier < 0?'-':'+',
         origEML: csEffEML,
-        effEML: csEffEML + csDialogResult.addlModifier,
-        effAML: csEffEML + csDialogResult.addlModifier,
+        effEML: csEffEML + csAdjustedModifier,
+        effAML: csEffEML + csAdjustedModifier,
         effDML: 0,
         attackRoll: csRoll.rollObj.total,
         atkRollResult: csRoll.description,
@@ -737,12 +746,16 @@ export async function dodgeResume(atkToken, defToken, type, weaponName, effAML, 
 
     const speaker = ChatMessage.getSpeaker({token: atkToken.document});
 
+    // Apply -10 aim penalty for High/Low aim when defender actively defends
+    const aimPenalty = (aim !== 'Mid') ? -10 : 0;
+    const adjustedAML = Number(effAML) + aimPenalty;
+
     const atkRoll = await DiceHM3.rollTest({
         data: {},
         diceSides: 100,
         diceNum: 1,
         modifier: 0,
-        target: effAML
+        target: adjustedAML
     });
 
     const effDML = defToken.actor.system.dodge;
@@ -792,7 +805,7 @@ export async function dodgeResume(atkToken, defToken, type, weaponName, effAML, 
         defTokenId: defToken.id,
         attackWeapon: weaponName,
         outnumbered: defToken.actor?.system?.eph?.outnumbered > 1 ? defToken.actor.system.eph.outnumbered : null,
-        effAML: effAML,
+        effAML: adjustedAML,
         defense: 'Dodge',
         effDML: effDML+outnumberedMod,
         attackRoll: atkRoll.rollObj.total,
@@ -865,12 +878,16 @@ export async function blockResume(atkToken, defToken, type, weaponName, effAML, 
 
     const speaker = ChatMessage.getSpeaker({token: atkToken.document});
 
+    // Apply -10 aim penalty for High/Low aim when defender actively defends
+    const aimPenalty = (aim !== 'Mid') ? -10 : 0;
+    const adjustedAML = Number(effAML) + aimPenalty;
+
     const atkRoll = await DiceHM3.rollTest({
         data: {},
         diceSides: 100,
         diceNum: 1,
         modifier: 0,
-        target: effAML
+        target: adjustedAML
     });
 
     let prompt = null;
@@ -1017,7 +1034,7 @@ export async function blockResume(atkToken, defToken, type, weaponName, effAML, 
         mlType: 'DML',
         attackWeapon: weaponName,
         defendWeapon: defWeapon ? defWeapon.name : "",
-        effAML: effAML,
+        effAML: adjustedAML,
         effDML: effDML + dialogResult.addlModifier,
         defense: `Block w/ ${dialogResult.weapon}`,
         addlModifierAbs: Math.abs(dialogResult.addlModifier),
