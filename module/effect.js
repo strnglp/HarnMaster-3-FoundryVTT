@@ -37,7 +37,8 @@ export async function onManageActiveEffect(event, owner) {
                     const aeData = {
                         name: "New Effect",
                         img: "icons/svg/aura.svg",
-                        origin: owner.uuid
+                        origin: owner.uuid,
+                        transfer: owner.documentName === 'Item'
                     };
                     if (startType === 'nowGameTime') {
                         aeData['duration.startTime'] = dialogData.gameTime;

@@ -662,7 +662,7 @@ export class HarnMasterActor extends Actor {
                 let assocSkill = itemData.assocSkill;
                 if (typeof combatSkills[assocSkill] !== 'undefined') {
                     let skillEml = combatSkills[assocSkill].eml;
-                    itemData.attackMasteryLevel = (skillEml || 0) + (itemData.attackModifier || 0);
+                    itemData.attackMasteryLevel = (skillEml || 0) + (itemData.attackModifier || 0) + (eph.missileAMLMod || 0);
                 }
             } else if (it.type === 'weapongear') {
                 // Reset mastery levels in case nothing matches
@@ -686,8 +686,8 @@ export class HarnMasterActor extends Actor {
                 let assocSkill = itemData.assocSkill;
                 if (typeof combatSkills[assocSkill] !== 'undefined') {
                     let skillEml = combatSkills[assocSkill].eml;
-                    itemData.attackMasteryLevel = (skillEml || 0) + (itemData.attack || 0) + (itemData.attackModifier || 0);
-                    itemData.defenseMasteryLevel = (skillEml || 0) + (itemData.defense || 0);
+                    itemData.attackMasteryLevel = (skillEml || 0) + (itemData.attack || 0) + (itemData.attackModifier || 0) + (eph.meleeAMLMod || 0);
+                    itemData.defenseMasteryLevel = (skillEml || 0) + (itemData.defense || 0) + (eph.meleeDMLMod || 0);
                 }
             }
         });
@@ -1041,7 +1041,19 @@ export class HarnMasterActor extends Actor {
      * The "value" field should look like "<item name>:<magnitude>"
      */
      _applyWeaponActiveEffects() {
-        const changes = this.effects.reduce((chgs, e) => {
+        // Collect all applicable effects: actor effects + weapon item effects with transfer
+        const allEffects = [...this.effects];
+        for (let item of this.items.values()) {
+            if (item.type === 'weapongear' || item.type === 'missilegear') {
+                for (let effect of item.effects.values()) {
+                    if (effect.transfer && !effect.disabled) {
+                        allEffects.push(effect);
+                    }
+                }
+            }
+        }
+
+        const changes = allEffects.reduce((chgs, e) => {
             if (e.disabled) return chgs;
             const amlChanges = e.changes.filter(chg => {
                 if (chg.key === 'system.eph.itemAMLMod') {
@@ -1049,10 +1061,12 @@ export class HarnMasterActor extends Actor {
                     if (val.length != 2) return false;
                     const magnitude = Number.parseInt(val[1], 10);
                     if (isNaN(magnitude)) return false;
-                    const skillName = val[0];
-                    for (let item in this.items.values()) {
-                        if ((item.name === skillName) &&
-                        (item.type === 'weapongear' || item.type === 'missilegear')) return true;
+                    const itemName = val[0];
+                    for (let item of this.items.values()) {
+                        if ((item.name === itemName) &&
+                        (item.type === 'weapongear' || item.type === 'missilegear')) {
+                            return true;
+                        }
                     }
                 }
 
@@ -1065,9 +1079,9 @@ export class HarnMasterActor extends Actor {
                     if (val.length != 2) return false;
                     const magnitude = Number.parseInt(val[1], 10);
                     if (isNaN(magnitude)) return false;
-                    const skillName = val[0];
-                    for (let item in this.items.values()) {
-                        if ((item.name === skillName) &&
+                    const itemName = val[0];
+                    for (let item of this.items.values()) {
+                        if ((item.name === itemName) &&
                         item.type === 'weapongear') return true;
                     }
                 }

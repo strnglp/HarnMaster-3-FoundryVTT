@@ -102,11 +102,11 @@
                             data-effect-id="{{effect.data._id}}">
                             <div class="effect-name flexrow">
                                 <div class="effect-image" style="background-image: url('{{effect.data.icon}}')"></div>
-                                <h4>{{effect.data.label}}</h4>
+                                <h4>{{effect.data.name}}</h4>
                             </div>
                             <div class="effect-ele effect-duration">{{effect.duration.label}}</div>
                             <div class="effect-ele effect-changes">{{effect.changes}}</div>
-                            <div class="effect-controls">
+                            <div class="effect-controls" style="pointer-events: auto;">
                                 <a class="effect-control" data-action="toggle"><i
                                         class="{{#unless (or effect.data.disabled hasActor)}}active{{/unless}} fas fa-circle-notch"></i></a>
                                 <a class="effect-control" data-action="edit"><i

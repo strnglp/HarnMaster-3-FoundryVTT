@@ -92,6 +92,7 @@ export class HarnMasterBaseActorSheet extends ActorSheet {
             data.effects[effect.id] = {
                 'id': effect.id,
                 'name': effect.name,
+                'img': effect.img,
                 'sourceName': effect.sourceName,
                 'duration': utility.aeDuration(effect),
                 'source': effect,

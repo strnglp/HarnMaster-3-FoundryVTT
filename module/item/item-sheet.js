@@ -40,7 +40,7 @@ export class HarnMasterItemSheet extends ItemSheet {
     data.hasMagicSkills = false;
 
     data.macroTypes = foundry.utils.deepClone(game.system.documentTypes.Macro);
-    
+
     data.containers = { 'On Person': 'on-person' };
     // Containers are not allowed in other containers.  So if this item is a container,
     // don't show any other containers.
@@ -60,7 +60,7 @@ export class HarnMasterItemSheet extends ItemSheet {
       if (this.actor) {
         this.actor.itemTypes.skill.forEach(it => {
           if (it.system.type === 'Magic') {
-            data.convocations.push(it.data.name);
+            data.convocations.push(it.name);
             data.hasMagicSkills = true;
           }
         });
@@ -110,14 +110,13 @@ export class HarnMasterItemSheet extends ItemSheet {
 
     data.effects = {};
     this.item.effects.forEach(effect => {
-      effect._getSourceName().then(()=> {
         data.effects[effect.id] = {
-          'source': effect.sourceName,
-          'duration': utility.aeDuration(effect),
-          'data': effect,
-          'changes': utility.aeChanges(effect)
-        }
-      })
+            'sourceName': effect.sourceName,
+            'duration': utility.aeDuration(effect),
+            'data': effect,
+            'changes': utility.aeChanges(effect),
+            'disabled': effect.disabled
+        };
     });
 
     return data;

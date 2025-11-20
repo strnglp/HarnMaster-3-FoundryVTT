@@ -310,7 +310,7 @@
                                     </li>
                                 {{/if}}
                             {{/each}}
-                        </ol>        
+                        </ol>
                     </ol>
                     <ol class="items-list traits-list">
                         <li class="items-header trait flexrow">
@@ -342,7 +342,7 @@
                                     </li>
                                 {{/if}}
                             {{/each}}
-                        </ol>        
+                        </ol>
                     </ol>
                 </div>
                 <div class="flexcol">
@@ -550,7 +550,7 @@
                 <div class="combat-stat flexrow">
                     <div class="item-dice"></div>
                     <label class="combat-stat-label">Endur.</label>
-                    <div class="combat-stat-value">{{adata.endurance}}</div>                    
+                    <div class="combat-stat-value">{{adata.endurance}}</div>
                 </div>
             </div>
             <div class="combat-stat flexrow"></div>
@@ -909,7 +909,7 @@
                     {{/select}}
                 </select>
             </div>
-        
+
             <div class="form-group stacked command">
                 <label>Command</label>
                 <textarea name="system.macros.command">{{adata.macros.command}}</textarea>
@@ -935,16 +935,16 @@
                 </li>
                 <ol class="effect-list item-list">
                 {{#each effects as |effect id|}}
-                    <li class="effect {{#if effect.disabled}}disabled{{/if}} flexrow" data-effect-name="{{effect.label}}"
+                    <li class="effect {{#if effect.disabled}}disabled{{/if}} flexrow" data-effect-name="{{effect.name}}"
                         data-effect-id="{{effect.id}}">
                         <div class="effect-name flexrow">
-                            <div class="effect-image" style="background-image: url('{{effect.icon}}')"></div>
-                            <h4>{{effect.label}}</h4>
+                            <div class="effect-image" style="background-image: url('{{effect.img}}')"></div>
+                            <h4>{{effect.name}}</h4>
                         </div>
                         <div class="effect-ele effect-source">{{effect.sourceName}}</div>
                         <div class="effect-ele effect-duration">{{effect.duration.label}}</div>
                         <div class="effect-ele effect-changes">{{effect.changes}}</div>
-                        <div class="effect-controls">
+                        <div class="effect-controls" style="pointer-events: auto;">
                             <a class="effect-control" data-action="toggle"><i class="{{#unless effect.disabled}}active{{/unless}} fas fa-circle-notch"></i></a>
                             <a class="effect-control" data-action="edit"><i class="active fas fa-edit"></i></a>
                             <a class="effect-control" data-action="delete"><i class="active fas fa-trash"></i></a>
