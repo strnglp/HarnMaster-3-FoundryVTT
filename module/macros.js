@@ -768,6 +768,7 @@ export async function initiativeRoll(noDialog = false, myActor = null) {
         notesData: {},
         speaker: actorInfo.speaker,
         fastforward: noDialog,
+        dialogTemplate: 'systems/hm3/templates/dialog/initiative-dialog.html',
         notes: '',
         resultNotes: {
             cs: '<b>CS:</b> Character selects and executes any Action Option, with a +10 bonus to EML. If the character\'s current morale state is non-normal, it returns to normal.',

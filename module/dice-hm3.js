@@ -31,7 +31,8 @@ export class DiceHM3 {
             type: rollData.type,
             target: rollData.target,
             label: rollData.label,
-            modifier: rollData.modifier || 0
+            modifier: rollData.modifier || 0,
+            template: rollData.dialogTemplate
         };
 
         // Create the Roll instance
