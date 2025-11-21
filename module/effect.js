@@ -9,7 +9,19 @@ export async function onManageActiveEffect(event, owner) {
     event.preventDefault();
     const a = event.currentTarget;
     const li = a.closest("li");
-    const effect = li.dataset.effectId ? owner.effects.get(li.dataset.effectId) : null;
+
+    // Find effect - check owner first, then search items for transferred effects
+    let effect = null;
+    if (li.dataset.effectId) {
+        effect = owner.effects.get(li.dataset.effectId);
+        if (!effect && owner.items) {
+            // Search through items for the effect
+            for (const item of owner.items.values()) {
+                effect = item.effects.get(li.dataset.effectId);
+                if (effect) break;
+            }
+        }
+    }
     switch (a.dataset.action) {
         case "create":
             const dlgTemplate = "systems/hm3/templates/dialog/active-effect-start.html";

@@ -86,8 +86,10 @@ export class HarnMasterBaseActorSheet extends ActorSheet {
             'containergear': 'Container'
         };
 
-        // get active effects.
+        // get active effects (from actor and transferred from items)
         data.effects = {};
+
+        // Actor's own effects
         this.actor.effects.forEach(effect => {
             data.effects[effect.id] = {
                 'id': effect.id,
@@ -99,6 +101,24 @@ export class HarnMasterBaseActorSheet extends ActorSheet {
                 'changes': utility.aeChanges(effect),
                 'disabled': effect.disabled
             };
+        });
+
+        // Transferred effects from items
+        this.actor.items.forEach(item => {
+            item.effects.forEach(effect => {
+                if (effect.transfer) {
+                    data.effects[effect.id] = {
+                        'id': effect.id,
+                        'name': effect.name,
+                        'img': effect.img,
+                        'sourceName': item.name,
+                        'duration': utility.aeDuration(effect),
+                        'source': effect,
+                        'changes': utility.aeChanges(effect),
+                        'disabled': effect.disabled
+                    };
+                }
+            });
         });
 
         return data;

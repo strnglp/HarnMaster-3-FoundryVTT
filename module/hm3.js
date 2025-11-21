@@ -166,6 +166,26 @@ Hooks.on('updateCombat', async (combat, updateData) => {
 });
 
 /**
+ * Automatically show Active Effect icons on tokens by adding to statuses
+ */
+Hooks.on('preCreateActiveEffect', (effect, data, options, userId) => {
+    // Generate a unique status ID for this effect
+    const statusId = `hm3-effect-${foundry.utils.randomID()}`;
+    effect.updateSource({ statuses: [statusId] });
+});
+
+Hooks.on('preUpdateActiveEffect', (effect, changes, options, userId) => {
+    // Preserve existing statuses, or add one if none exist
+    if (!effect.statuses?.size) {
+        const statusId = `hm3-effect-${effect.id}`;
+        changes.statuses = [statusId];
+    } else if (changes.statuses !== undefined && changes.statuses.length === 0) {
+        // Prevent statuses from being cleared
+        changes.statuses = Array.from(effect.statuses);
+    }
+});
+
+/**
  * Once the entire VTT framework is initialized, check to see if
  * we should perform a data migration.
  */
