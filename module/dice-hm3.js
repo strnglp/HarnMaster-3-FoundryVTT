@@ -168,7 +168,8 @@ export class DiceHM3 {
                     diceNum: 1,
                     modifier: formModifier
                 });
-            }
+            },
+            rejectClose: false
         });
     }
     
@@ -302,7 +303,8 @@ export class DiceHM3 {
                     diceNum: dialogOptions.numdice,
                     modifier: formModifier
                 });
-            }
+            },
+            rejectClose: false
         });
     }
 
@@ -530,9 +532,10 @@ export class DiceHM3 {
                 const formAim = form.aim.value;
                 const formAddToCharSheet = dialogData.askRecordInjury ?
                     form.addToCharSheet.checked : recordInjury === 'enable';
-                return DiceHM3._calcInjury(formLocation, formImpact, formAspect, 
+                return DiceHM3._calcInjury(formLocation, formImpact, formAspect,
                     formAddToCharSheet, formAim, dialogOptions);
-            }
+            },
+            rejectClose: false
         });
     }
 
@@ -926,7 +929,8 @@ export class DiceHM3 {
                     rollObj: roll.rollObj
                 }
                 return result;
-            }
+            },
+            rejectClose: false
         });
     }
 
@@ -1073,7 +1077,8 @@ export class DiceHM3 {
                     rollObj: roll.rollObj
                 }
                 return result;
-            }
+            },
+            rejectClose: false
         });
     }
 
@@ -1207,7 +1212,8 @@ export class DiceHM3 {
                     rollObj: roll.rollObj
                 }
                 return result;
-            }
+            },
+            rejectClose: false
         });
     }
 

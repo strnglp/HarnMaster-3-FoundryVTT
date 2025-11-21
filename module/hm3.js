@@ -255,7 +255,8 @@ async function welcomeDialog() {
             const data = fd.object;
             return data.showOnStartup;
         },
-        options: { jQuery: false }
+        options: { jQuery: false },
+        rejectClose: false
     });
 }
 

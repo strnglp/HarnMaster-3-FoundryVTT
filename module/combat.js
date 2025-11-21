@@ -309,7 +309,8 @@ async function selectWeaponDialog(options) {
             const formWeapon = form.weapon.value;
 
             return {weapon: formWeapon, addlModifier: formAddlModifier};
-        }
+        },
+        rejectClose: false
     });
 
 }
@@ -458,7 +459,8 @@ async function attackDialog(options) {
                 result.impactMod = dialogOptions.aspects[result.aspect] || 0;
             }
             return result;
-        }
+        },
+        rejectClose: false
     });
 }
 

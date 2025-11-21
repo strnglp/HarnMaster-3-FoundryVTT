@@ -280,7 +280,8 @@ export class HarnMasterBaseActorSheet extends ActorSheet {
                     return await this._moveItems(item, formQtyToMove);
                 }
             },
-            options: { jQuery: false }
+            options: { jQuery: false },
+            rejectClose: false
         });
     }
 
@@ -827,7 +828,8 @@ export class HarnMasterBaseActorSheet extends ActorSheet {
 
                 return result;
             },
-            options: { jQuery: false }
+            options: { jQuery: false },
+            rejectClose: false
         });
     }
 
