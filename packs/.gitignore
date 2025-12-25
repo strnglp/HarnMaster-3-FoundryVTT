@@ -1,4 +1,5 @@
-*.ldb
+# .ldb files don't seem to autogenerate in v13 so I'll build them and push them to git
+#*.ldb
 *.log
 CURRENT
 LOCK
